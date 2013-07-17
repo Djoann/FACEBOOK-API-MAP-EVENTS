@@ -10,7 +10,18 @@
 <style>
 
     #map {
-        height: 300px;
+        height: 500px;
+        position: relative;
+    }
+    
+    #controls {
+        position: relative;
+        float: left;
+    }
+    
+    #eventdata {
+        position: fixed;
+        float: left;
     }
 
 </style>
@@ -28,10 +39,10 @@
 <body>
 
 <div id="map"></div>
-<button onclick="events()">Search</button>
-<button onclick="mapped()">Mapped</button>
-
-
+<div id="controls">
+    <button onclick="events()">Search</button>
+    <button onclick="mapped()">Mapped</button>
+</div>
 <div id="eventdata" class="box">Events</div>
 
 </body>
@@ -42,7 +53,7 @@ var addressPoints = new Array();
 
 
 function events() { 
-    $.getJSON('https://graph.facebook.com/search?q=party&type=event&limit=500&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD&callback=?', function(data) { 
+    $.getJSON('https://graph.facebook.com/search?q=party&type=event&limit=500&access_token=CAACEdEose0cBANUAW9CK6SVALEjZBXs41v5IMuV2AbRJUl8sTr2deR7jOp80zeOcHdv26gvsEPk4EDc7y154Q27B0u9lGbMV3XZCyK8ot8Rs2aQox5IWQCojthPZAUmzVKzV72UeYacgyERZCez5DOdQE7TCeZCwI70pmgTzaigZDZD&callback=?', function(data) { 
       
             
     var datarecu = data['data'].length;
@@ -109,9 +120,9 @@ function mapped() {
 function eventid(id) {
         
                         
-        $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD', function(data) {   
+        $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBANUAW9CK6SVALEjZBXs41v5IMuV2AbRJUl8sTr2deR7jOp80zeOcHdv26gvsEPk4EDc7y154Q27B0u9lGbMV3XZCyK8ot8Rs2aQox5IWQCojthPZAUmzVKzV72UeYacgyERZCez5DOdQE7TCeZCwI70pmgTzaigZDZD', function(data) {   
         
-        //'https://graph.facebook.com/'+ id +'?fields=description,members.fields(hometown),name,owner,link,venue&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD'
+        //'https://graph.facebook.com/'+ id +'?fields=description,members.fields(hometown),name,owner,link,venue&access_token=CAACEdEose0cBANUAW9CK6SVALEjZBXs41v5IMuV2AbRJUl8sTr2deR7jOp80zeOcHdv26gvsEPk4EDc7y154Q27B0u9lGbMV3XZCyK8ot8Rs2aQox5IWQCojthPZAUmzVKzV72UeYacgyERZCez5DOdQE7TCeZCwI70pmgTzaigZDZD'
         
         //console.log(data);
         var names = data.name;

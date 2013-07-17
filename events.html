@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Events Finder</title>
+    <!--  ICON  -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <!--  JQUERY  -->
+    <script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js"></script>
+    
+    <!-- Loading Bootstrap -->
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+        <!-- Loading Flat UI -->
+        <link href="css/flat-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!--  GEOCODER -->    
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <!-- MARKER CLUSTER -->
+    <link rel="stylesheet" href="markers/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="markers/dist/MarkerCluster.Default.css" />
+    	<!--[if lte IE 8]><link rel="stylesheet" href="markers/dist/MarkerCluster.Default.ie.css" /><![endif]-->
+    <script src="markers/dist/leaflet.markercluster-src.js"></script>
+    
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+    <![endif]-->
+    
+    <style>
+    
+    #map { z-index: 10;
+        width: 100%; height: 600px; margin: 0 0 0 0px;
+    }
+    
+    #menu {
+background-color: white;
+top: 1px;
+z-index: 999;
+position: fixed;
+height: 610px;
+overflow: scroll;
+width: 400px;
+float: right;
+margin-left: 65%;
+    }
+    
+    
+    #info {
+        float: left;
+        width: 300px;
+    }
+    #searchaddressbox {
+        margin-top: 5px;
+        float: left;
+        position: fixed;
+        z-index: 1;
+        height: 30px !important;
+        width: 60%;
+        font-family: "HelveticaNeueW01-75Bold", "Helvetica", Arial, sans-serif;
+        border-radius: 4px;
+        outline: none;
+        font-size: 18px;
+        line-height: 18px;
+        
+    }
+    .title1 {
+        padding: 10px;
+        height: 50px;
+        position: relative;
+        line-height: 20px !important;
+        font: bold 4em/5em "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+    }
+    #photos {
+        margin: auto;
+    }
+    
+    #boxcontent {
+        background-color: #E9E9E9;
+        border-radius: 5px;
+        margin: 5px;
+        padding: 10px;
+    }
+    #groups {
+        margin-left: 10px;
+        padding: 20px;
+        top: 120px;
+        position: fixed;
+        overflow-y: scroll;
+        height: 450px;
+    }
+    
+    .leaflet-popup-content-wrapper {
+        max-width: 250px;
+    }
+    
+    .display {
+        position: fixed;
+        margin-top: 2%;
+        margin-left: 59%;
+        z-index: 10;
+    }
+    
+    .leaflet-popup-close-button {
+        position: fixed;
+        margin-top: 20px;
+        margin-left: 180px;
+        z-index: 1500;
+    }
+    
+    
+    .input_text {
+    
+    padding:10px 10px;
+    
+    background:#fff;
+    
+    border-bottom: 2px double #171717;
+    
+    border-top: 2px double #171717;
+    
+    border-left: 2px double #333333;
+    
+    border-right: 2px double #333333;
+    
+    }
+    
+    .querytype {
+        float: right;
+    }
+    
+    #querybox {
+        margin-left: 10px;
+        margin-top: 5px;
+        float: left;
+        position: fixed;
+        z-index: 1;
+        height: 30px !important;
+        width: 65%;
+        font-family: "HelveticaNeueW01-75Bold", "Helvetica", Arial, sans-serif;
+        border-radius: 4px;
+        outline: none;
+        font-size: 18px;
+        line-height: 18px;
+    }
+    </style>
+    
+    
+    
+ 
+    
+    </head>
+
+    <body>
+    
+    <div id="map"></div>
+    
+    <div id="querybox">
+        <input id="searchaddressbox" class="input_text" type="text" placeholder="Search" value="Search">
+    </div>
+    
+    <div id="menu">
+        <h1 class="title1">Events List</h1>
+<!--        <div width="50%" class="pbm">
+                        <div class="switch has-switch"><div class="switch-animate switch-on"><input type="checkbox" checked="" data-toggle="switch"><span class="switch-left">ON</span><label>&nbsp;</label><span class="switch-right">OFF</span></div></div>
+          </div>-->
+        <div id="groups"></div>
+    </div>   
+    
+   <script type="text/javascript">
+        $(document).ready();
+         
+        //geocoder
+        function initialize() {
+          geocoder = new google.maps.Geocoder();
+        }  
+        
+        google.maps.event.addDomListener(window, 'load', initialize);
+         
+        // Clear when new input    
+        function clear() {
+            $('#groups').children().remove();
+        }
+        
+        //Keypress Input
+        $("input#searchaddressbox").keydown(function(e){
+            if (e.keyCode == 13 && !e.shiftKey)
+            {    
+                var query = $("input#searchaddressbox").val();
+                clear();
+                console.log("keypress" + query);
+                //codeAddress();
+                events(query);
+                
+                function codeAddress() {
+                  var address = document.getElementById('searchaddressbox').value;
+                  console.log("yesss");
+                  geocoder.geocode( { 'address': address}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                    
+                      console.log(results[0].geometry.location.jb);
+                      console.log(results[0].geometry.location.kb);
+                      // end interesting function
+                      var lat = results[0].geometry.location.jb;
+                      var lng = results[0].geometry.location.kb;
+                      map.setView([lat ,  lng], 11);
+                      
+                    } else {
+                      alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                  });
+                }
+            } else {
+            console.log("pas ok");
+        }
+        }); 
+    
+    </script>
+    <script type="text/javascript">
+       var coords = 0;
+        
+       // SET MASTER MAP
+       var map = L.map('map').setView([48.85522811385678, 2.3531341552734375 ], 2);
+       L.tileLayer('http://{s}.tile.cloudmade.com/ffdd86e27a8a46129afb5e678456afaf/997/256/{z}/{x}/{y}.png', {
+           attribution: 'Hello Groups',
+           maxZoom: 18
+       }).addTo(map);
+    
+    </script>
+    <script type="text/javascript">
+    
+    var addressPoints = new Array();
+    
+    function events(query) { 
+        console.log("launched", query);
+        $.getJSON('https://graph.facebook.com/search?q='+ query +'&type=event&limit=1000&access_token=CAACEdEose0cBAHQ9HRUobOjxzDIUY0ZA4lk2nkleAurNLZBchJfTDIFUarP7OjSZA21gAhi5cRpTitrAN3mq7DLQz4QoNS2mijYZBgUpuoLtC0pK9XFmYdC85u21ZCZClhnZAoeioDxdSi9x4QHcfJYszdVZBZBI6PK4hFmjDqL4URwZDZD&callback=?', function(data) { 
+                
+        var datarecu = data['data'].length;
+        console.log(datarecu + 'events received');
+        
+        var id = [0]
+        var dataMaj = []
+        
+        for (i = 0; i < datarecu; i++) {
+            id[i] = data['data'][i].id;
+            eventid(id[i]); 
+        }
+    })
+    
+    setTimeout(function(){mapped()},10000);
+    }; // end function events()
+    
+    function mapped() {
+        $(".eventlatlng").each( function () {
+                var e = $(this);
+                var lat = e.attr("data-lat");
+                var lng = e.attr("data-lng");
+                var title = e.text();
+                var geodata = [lat, lng, title]
+                
+                addressPoints.push(geodata);
+                console.log(geodata , "Bind on map");
+        });
+        //console.log(addressPoints);
+        
+        var markers = L.markerClusterGroup();
+        
+        		for (var i = 0; i < addressPoints.length; i++) {
+        			var a = addressPoints[i];
+        			var title = a[2];
+        			var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
+        			marker.bindPopup(title);
+        			markers.addLayer(marker);
+        		}
+        map.addLayer(markers);
+        
+        // Click Set new view from A HREF
+        $(".eventlatlng").click( function () {
+            var lat = $(this).data("lat");
+            var lng = $(this).data("lng");
+            console.log(lat , lng , "Zoomed");
+            //au cas ou pas de marker : 
+            var marker = L.marker([lat, lng]).bindPopup("Viewed").addTo(map);
+            map.setView([lat ,  lng], 11);
+        }) 
+    }
+    
+    
+    function eventid(id) {
+            
+                // add attendees            
+            $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBAHQ9HRUobOjxzDIUY0ZA4lk2nkleAurNLZBchJfTDIFUarP7OjSZA21gAhi5cRpTitrAN3mq7DLQz4QoNS2mijYZBgUpuoLtC0pK9XFmYdC85u21ZCZClhnZAoeioDxdSi9x4QHcfJYszdVZBZBI6PK4hFmjDqL4URwZDZD', function(data) {   
+            var names = data.name;
+            
+            if (data.venue.latitude == undefined)
+            {
+                var dataeventSelf = "<div class=\"events\"><div id='boxcontent'><br /><p class=\"legende\"><a href=\"https://www.facebook.com/events/"+ id +"\" target='_blank'>" + names + "</a></p></div></div>"
+                 
+                 $('#eventdata').append(dataeventSelf); 
+                 
+            } else {
+                 var lat = data.venue.latitude;
+                 var lng = data.venue.longitude;
+                 //Code here when the Element Exists.
+                 var dataevent = "<div class=\"events\"><div id='boxcontent'><br /><p class=\"legende\"><a class=\"eventlatlng\" data-lat="+ lat +" data-lng="+ lng +" href=\"#eventlatlng\">" + names + "</a></p><a class=\"link\" href=\"https://www.facebook.com/events/"+ id +"\" target='_blank'>Link</a></div></div>"
+                  
+                  $('#groups').append(dataevent);
+            }; 
+        }); // fin du GetJSON  id
+    }
+    
+    </script>
+    </body>
+
+    </html>
