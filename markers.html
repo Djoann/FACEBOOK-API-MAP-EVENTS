@@ -1,0 +1,158 @@
+<html>
+
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="markers/realworld.388.js" type="text/javascript"></script>
+
+<style>
+
+    #map {
+        height: 300px;
+    }
+
+</style>
+
+<!-- MARKER CLUSTER -->
+<link rel="stylesheet" href="markers/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="markers/dist/MarkerCluster.Default.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="markers/dist/MarkerCluster.Default.ie.css" /><![endif]-->
+<script src="markers/dist/leaflet.markercluster-src.js"></script>
+</head>
+
+
+
+
+<body>
+
+<div id="map"></div>
+<button onclick="events()">Search</button>
+<button onclick="mapped()">Mapped</button>
+
+
+<div id="eventdata" class="box">Events</div>
+
+</body>
+
+<script type="text/javascript">
+
+var addressPoints = new Array();
+
+
+function events() { 
+    $.getJSON('https://graph.facebook.com/search?q=party&type=event&limit=500&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD&callback=?', function(data) { 
+      
+            
+    var datarecu = data['data'].length;
+    console.log(datarecu + 'events received');
+    
+    var id = [0]
+    var dataMaj = []
+    
+    for (i = 0; i < datarecu; i++) {
+        id[i] = data['data'][i].id;
+        eventid(id[i]);
+        
+    }
+})
+
+setTimeout(function(){mapped()},10000);
+}; // end events()
+
+    
+function mapped() {
+    $(".eventlatlng").each( function () {
+            var e = $(this);
+            var lat = e.attr("data-lat");
+            var lng = e.attr("data-lng");
+            var title = e.text();
+            console.log(title);
+            
+            var geodata = [lat, lng, title]
+            
+            console.log(geodata , "Bind on map");
+            
+            addressPoints.push(geodata)
+            //var marker = L.marker([lat, lng]).bindPopup(e.html()).addTo(map);
+            //marker.on("click", function () { marker.openPopup()})
+    });
+    console.log(addressPoints);
+    
+    
+    var markers = L.markerClusterGroup();
+    
+    		for (var i = 0; i < addressPoints.length; i++) {
+    			var a = addressPoints[i];
+    			var title = a[2];
+    			var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
+    			marker.bindPopup(title);
+    			markers.addLayer(marker);
+    		}
+    
+    map.addLayer(markers);
+    
+    
+    // Click Set new view from A HREF
+    $(".eventlatlng").click( function () {
+        var lat = $(this).data("lat");
+        var lng = $(this).data("lng");
+        console.log(lat , lng + "Zoomed");
+        //au cas ou pas de marker : 
+        var marker = L.marker([lat, lng]).bindPopup("Viewed").addTo(map);
+        map.setView([lat ,  lng], 16);
+    }) 
+}
+
+
+function eventid(id) {
+        
+                        
+        $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD', function(data) {   
+        
+        //'https://graph.facebook.com/'+ id +'?fields=description,members.fields(hometown),name,owner,link,venue&access_token=CAACEdEose0cBAEgdjZAtbD3LAawKAgC6fuLxydQYeXZB1BM2ZAZAPrRMKFRXUr0QZAcrU3QTHHLrlmjEr6OYScVmfsTlFmBgnKNPzCytpZAdVGk9fwCLrZAXXcflqv9ZB8mzNwcE9FmiEbadVlJZALPA1nV3TuUIMZB8gPWxTmgfyJBQZDZD'
+        
+        //console.log(data);
+        var names = data.name;
+        
+        if (data.venue.latitude == undefined)
+        {
+            var dataeventSelf = "<div class=\"events\"><div id='boxcontent'><br /><p class=\"legende\"><a href=\"https://www.facebook.com/events/"+ id +"\" target='_blank'>" + names + "</a></p></div></div>"
+             
+             $('#eventdata').append(dataeventSelf); 
+             
+        } else {
+             var lat = data.venue.latitude;
+             var lng = data.venue.longitude;
+             //Code here when the Element Exists.
+             var dataevent = "<div class=\"events\"><div id='boxcontent'><br /><p class=\"legende\"><a class=\"eventlatlng\" data-lat="+ lat +" data-lng="+ lng +" href=\"#eventlatlng\">" + names + "</a></p><a class=\"link\" href=\"https://www.facebook.com/events/"+ id +"\" target='_blank'>Link</a></div></div>"
+              
+              $('#eventdata').append(dataevent);
+              
+                // POINTS WITHOUT CLUSTER
+//              if (lat && lng) {
+//                  
+//                  var marker = L.marker([lat, lng]).bindPopup().addTo(map);
+//                  marker.on("click", function () { marker.openPopup()})
+//              }
+        }; 
+    
+    }); // fin du GetJSON  id
+ 
+}
+
+</script>
+<script type="text/javascript">
+   var coords = 0;
+    
+   // SET MASTER MAP
+   var map = L.map('map').setView([48.85522811385678, 2.3531341552734375 ], 2);
+   L.tileLayer('http://{s}.tile.cloudmade.com/ffdd86e27a8a46129afb5e678456afaf/997/256/{z}/{x}/{y}.png', {
+       attribution: 'Hello Groups',
+       maxZoom: 18
+   }).addTo(map);
+
+</script>
+
+</html>
