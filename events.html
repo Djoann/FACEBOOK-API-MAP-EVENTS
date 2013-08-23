@@ -234,7 +234,7 @@ margin-left: 65%;
     
     function events(query) { 
         console.log("launched", query);
-        $.getJSON('https://graph.facebook.com/search?q='+ query +'&type=event&limit=1000&access_token=CAACEdEose0cBAHQ9HRUobOjxzDIUY0ZA4lk2nkleAurNLZBchJfTDIFUarP7OjSZA21gAhi5cRpTitrAN3mq7DLQz4QoNS2mijYZBgUpuoLtC0pK9XFmYdC85u21ZCZClhnZAoeioDxdSi9x4QHcfJYszdVZBZBI6PK4hFmjDqL4URwZDZD&callback=?', function(data) { 
+        $.getJSON('https://graph.facebook.com/search?q='+ query +'&type=event&limit=100&access_token=CAACEdEose0cBAN32JCOvdZCQjwq4QNZCINvPh1xPATpVhshfw1LA4AD4XtNEHZCSsW0fsxdh2TJ0bhYaRzWKEVhlZBYL2ND1v5L9y9xkpdJLiZA1WEeuyDxkZBdYnSRgGR6F2phrVbwTwU62Mxrn3H5RCkJCZCPRbPTiTmQCgIQiwZDZD&callback=?', function(data) { 
                 
         var datarecu = data['data'].length;
         console.log(datarecu + 'events received');
@@ -290,7 +290,7 @@ margin-left: 65%;
     function eventid(id) {
             
                 // add attendees            
-            $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBAHQ9HRUobOjxzDIUY0ZA4lk2nkleAurNLZBchJfTDIFUarP7OjSZA21gAhi5cRpTitrAN3mq7DLQz4QoNS2mijYZBgUpuoLtC0pK9XFmYdC85u21ZCZClhnZAoeioDxdSi9x4QHcfJYszdVZBZBI6PK4hFmjDqL4URwZDZD', function(data) {   
+            $.getJSON('https://graph.facebook.com/'+ id +'?fields=name,venue&access_token=CAACEdEose0cBAN32JCOvdZCQjwq4QNZCINvPh1xPATpVhshfw1LA4AD4XtNEHZCSsW0fsxdh2TJ0bhYaRzWKEVhlZBYL2ND1v5L9y9xkpdJLiZA1WEeuyDxkZBdYnSRgGR6F2phrVbwTwU62Mxrn3H5RCkJCZCPRbPTiTmQCgIQiwZDZD', function(data) {   
             var names = data.name;
             
             if (data.venue.latitude == undefined)
